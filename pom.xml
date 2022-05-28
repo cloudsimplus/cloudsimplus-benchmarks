@@ -53,7 +53,7 @@
 
         <dependency>
             <groupId>org.cloudsimplus</groupId>
-            <artifactId>cloudsimplus</artifactId>
+            <artifactId>cloudsim-plus</artifactId>
             <version>${project.version}</version>
         </dependency>
 

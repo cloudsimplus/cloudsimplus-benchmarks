@@ -4,6 +4,10 @@
 
     <groupId>org.cloudsimplus</groupId>
     <artifactId>cloudsimplus-benchmarks</artifactId>
+    <!--
+    The module version defines the version of CloudSim Plus to be used.
+    This way, it cannot be a version number which doesn't exist for CloudSim Plus.
+    -->
     <version>7.3.0</version>
     <name>CloudSim Plus Benchmarks</name>
     <description>A module containing benchmarks created using JMH (Java Microbenchmark Harness framework) to assess CloudSim Plus performance</description>

@@ -23,10 +23,10 @@
  */
 package org.cloudsimplus.heuristics;
 
-import org.cloudbus.cloudsim.cloudlets.CloudletSimple;
-import org.cloudbus.cloudsim.distributions.UniformDistr;
-import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
-import org.cloudbus.cloudsim.vms.VmSimple;
+import org.cloudsimplus.cloudlets.CloudletSimple;
+import org.cloudsimplus.distributions.UniformDistr;
+import org.cloudsimplus.utilizationmodels.UtilizationModel;
+import org.cloudsimplus.vms.VmSimple;
 import org.openjdk.jmh.annotations.*;
 
 import java.util.stream.IntStream;

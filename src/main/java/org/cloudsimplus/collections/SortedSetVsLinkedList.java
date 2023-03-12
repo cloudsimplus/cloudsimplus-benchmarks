@@ -25,10 +25,10 @@ package org.cloudsimplus.collections;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
-import org.cloudbus.cloudsim.core.CloudSimTag;
-import org.cloudbus.cloudsim.core.SimEntity;
-import org.cloudbus.cloudsim.core.events.CloudSimEvent;
-import org.cloudbus.cloudsim.core.events.SimEvent;
+import org.cloudsimplus.core.CloudSimTag;
+import org.cloudsimplus.core.SimEntity;
+import org.cloudsimplus.core.events.CloudSimEvent;
+import org.cloudsimplus.core.events.SimEvent;
 import org.openjdk.jmh.annotations.*;
 
 import java.util.*;
@@ -93,7 +93,7 @@ public class SortedSetVsLinkedList {
 
     /**
      * Adds an always-incremented value into a {@link LinkedList}
-     * that uses the CloudSim's custom implementation to ensure order.
+     * that uses the CloudSimPlus's custom implementation to ensure order.
      * @return
      */
     @Benchmark
@@ -111,7 +111,7 @@ public class SortedSetVsLinkedList {
      * is increased just with a probability defined by {@link #VALUE_INCREASE_PROBABILITY}.
      * This way, we can benchmark the {@link TreeSet} and {@link LinkedList} when
      * events for the same time are generated consecutively.
-     * Such a {@link LinkedList} uses the CloudSim's custom implementation to ensure order.
+     * Such a {@link LinkedList} uses the CloudSimPlus's custom implementation to ensure order.
      * @return
      */
     @Benchmark
@@ -131,7 +131,7 @@ public class SortedSetVsLinkedList {
     }
 
     /**
-     * CloudSim's DeferredQueue uses a LinkedList and a custom
+     * CloudSimPlus's DeferredQueue uses a LinkedList and a custom
      * algorithm to ensure order when adding elements.
      * @return
      */
@@ -156,7 +156,7 @@ public class SortedSetVsLinkedList {
     }
 
     /**
-     * An alternative to CloudSim's DeferredQueue that ensures order when adding
+     * An alternative to CloudSimPlus's DeferredQueue that ensures order when adding
      * elements into a LinkedList. However, this implementations start looking
      * for the position to add an element from the end of the list,
      * since the time of the event is usually higher then the previous time.

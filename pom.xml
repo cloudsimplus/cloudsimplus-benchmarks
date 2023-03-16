@@ -11,7 +11,7 @@
     <version>8.0.0</version>
     <name>CloudSim Plus Benchmarks</name>
     <description>A module containing benchmarks created using JMH (Java Microbenchmark Harness framework) to assess CloudSim Plus performance</description>
-    <url>http://cloudsimplus.org</url>
+    <url>https://cloudsimplus.org</url>
 
     <inceptionYear>2016</inceptionYear>
 
@@ -38,7 +38,7 @@
     </scm>
 
     <issueManagement>
-        <url>http://github.com/cloudsimplus/cloudsimplus/issues</url>
+        <url>https://github.com/cloudsimplus/cloudsimplus/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 

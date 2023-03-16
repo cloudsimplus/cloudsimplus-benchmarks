@@ -32,13 +32,13 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:cloudsimplus/cloudsimplus.git</connection>
-        <developerConnection>scm:git:git@github.com:cloudsimplus/cloudsimplus.git</developerConnection>
-        <url>git@github.com:cloudsimplus/cloudsimplus.git</url>
+        <connection>scm:git:git@github.com:cloudsimplus/cloudsimplus-benchmarks.git</connection>
+        <developerConnection>scm:git:git@github.com:cloudsimplus/cloudsimplus-benchmarks.git</developerConnection>
+        <url>git@github.com:cloudsimplus/cloudsimplus-benchmarks.git</url>
     </scm>
 
     <issueManagement>
-        <url>https://github.com/cloudsimplus/cloudsimplus/issues</url>
+        <url>https://github.com/cloudsimplus/cloudsimplus-benchmarks/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 

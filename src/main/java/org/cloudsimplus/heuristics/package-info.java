@@ -6,4 +6,7 @@
  * <p>The main class that starts the benchmarks is the {@link org.cloudsimplus.benchmarks.Run}</p>.
  * @author Manoel Campos da Silva Filho
  */
+@NullMarked
 package org.cloudsimplus.heuristics;
+
+import org.jspecify.annotations.NullMarked;

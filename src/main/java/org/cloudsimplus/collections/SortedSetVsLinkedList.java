@@ -45,11 +45,14 @@ import java.util.*;
 @BenchmarkMode({Mode.AverageTime, Mode.Throughput})
 @State(Scope.Thread)
 public class SortedSetVsLinkedList {
+    @SuppressWarnings("NullAway.Init") // initialized in doSetup()
     private SortedSet<SimEvent> sortedSet;
+    @SuppressWarnings("NullAway.Init") // initialized in doSetup()
     private LinkedList<SimEvent> linkedList;
     private double time;
     private double maxTime;
     private int serial;
+    @SuppressWarnings("NullAway.Init") // initialized in doSetup()
     private RandomGenerator prng;
     /**
      * Defines the probability to increase or not the {@link #time}

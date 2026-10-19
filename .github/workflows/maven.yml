@@ -8,14 +8,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Java 17 Build
+    name: Java 21 Build
     steps:
       - uses: actions/checkout@v4
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: 17
+          java-version: 21
           cache: 'maven'
       - name: Maven Build
         run: mvn -B package

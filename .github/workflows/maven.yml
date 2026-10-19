@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Java 21 Build
+    name: Java Build
     steps:
       - uses: actions/checkout@v4
       - name: Setup Java

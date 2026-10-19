@@ -39,13 +39,16 @@ import java.util.stream.IntStream;
 @BenchmarkMode({Mode.AverageTime, Mode.Throughput})
 @State(Scope.Thread)
 public class CloudletToVmMappingSolutionBenchmark {
+    @SuppressWarnings("NullAway.Init") // initialized in doSetup()
     private CloudletToVmMappingSimulatedAnnealing heuristic;
+    @SuppressWarnings("NullAway.Init") // initialized in doSetup()
     private CloudletToVmMappingSolution instance1;
+    @SuppressWarnings("NullAway.Init") // initialized in doSetup()
     private CloudletToVmMappingSolution instance2;
 
     @Setup
     public void doSetup() {
-        CloudletToVmMappingSimulatedAnnealing heuristic =
+        heuristic =
             new CloudletToVmMappingSimulatedAnnealing(0, new UniformDistr(0, 1));
         instance1 = createInstance();
         instance2 = createInstance();

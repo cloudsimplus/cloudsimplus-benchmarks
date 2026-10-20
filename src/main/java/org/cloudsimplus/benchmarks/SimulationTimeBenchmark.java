@@ -48,16 +48,14 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 
-/**
- * A benchmark that executes a simulation scenario
- * multiple times to assess the scalability of CloudSim Plus,
- * by means of simulation execution time.
- * Each simulation run increases the number of Hosts, VMs and Cloudlets.
- * That benchmark doesn't use JHM benchmarking framework.
- *
- * @author Manoel Campos da Silva Filho
- * @since CloudSim Plus 6.2.0
- */
+/// A benchmark that executes a simulation scenario
+/// multiple times to assess the scalability of CloudSim Plus,
+/// by means of simulation execution time.
+/// Each simulation run increases the number of Hosts, VMs and Cloudlets.
+/// That benchmark doesn't use JHM benchmarking framework.
+///
+/// @author Manoel Campos da Silva Filho
+/// @since CloudSim Plus 6.2.0
 public class SimulationTimeBenchmark {
     public static final int SIMULATIONS = 4;
     public static final int HOSTS_INCREMENT = 100;
@@ -65,9 +63,7 @@ public class SimulationTimeBenchmark {
     private static final int HOST_PES = 64;
 
     private static final int VM_PES = 1;
-    /**
-     * Value used to multiply the number of VMs to get the number of Cloudlets.
-     */
+    /// Value used to multiply the number of VMs to get the number of Cloudlets.
     private static final int VMS_MULTIPLIER = 55;
 
     private static final int CLOUDLET_PES = 1;
@@ -130,9 +126,7 @@ public class SimulationTimeBenchmark {
         this.finishTimeSecs = TimeUtil.elapsedSeconds(startTimeSecs);
     }
 
-    /**
-     * Creates a Datacenter and its Hosts.
-     */
+    /// Creates a Datacenter and its Hosts.
     private Datacenter createDatacenter() {
         final List<Host> hostList = new ArrayList<>(hostsNumber);
         for(int i = 0; i < hostsNumber; i++) {
@@ -163,9 +157,7 @@ public class SimulationTimeBenchmark {
         return new HostSimple(ram, bw, storage, peList);
     }
 
-    /**
-     * Creates a list of VMs.
-     */
+    /// Creates a list of VMs.
     private List<Vm> createVms() {
         final List<Vm> list = new ArrayList<>(vmsNumber);
         for (int i = 0; i < vmsNumber; i++) {
@@ -178,9 +170,7 @@ public class SimulationTimeBenchmark {
         return list;
     }
 
-    /**
-     * Creates a list of Cloudlets.
-     */
+    /// Creates a list of Cloudlets.
     private List<Cloudlet> createCloudlets() {
         final List<Cloudlet> list = new ArrayList<>(cloudletsNumber);
 

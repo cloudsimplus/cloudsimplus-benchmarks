@@ -25,13 +25,15 @@ package org.cloudsimplus.listeners;
 
 import org.openjdk.jmh.annotations.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /// Measures the time and memory to notify listeners stored in:
-/// - an immutable [List] created by [Listeners] (as CloudSim Plus does) and
+/// - an immutable [List] created by `List.of(array)` (as CloudSim Plus does) and
 /// - a plain array, which is the alternative being assessed.
+///
+/// The lists are created directly by `List.of(array)`, instead of using the CloudSim Plus class that stores listeners,
+/// so that the benchmark compiles against different CloudSim Plus versions.
 ///
 /// A for-each loop over a [List] calls [List#iterator()], which creates an object,
 /// unless the JIT removes it using escape analysis. A for-each loop over an array creates no object.
@@ -77,8 +79,8 @@ public class ListenersNotificationBenchmark {
 
         @Setup(Level.Trial)
         public void setup(final Counter counter) {
-            list = newList(listenersCount, counter);
-            array = toArray(list);
+            array = newListeners(listenersCount, counter);
+            list = List.of(array);
         }
     }
 
@@ -99,8 +101,8 @@ public class ListenersNotificationBenchmark {
             lists = new List[MAX_LISTENERS + 1];
             arrays = new EventListener[MAX_LISTENERS + 1][];
             for (int count = 0; count <= MAX_LISTENERS; count++) {
-                lists[count] = newList(count, counter);
-                arrays[count] = toArray(lists[count]);
+                arrays[count] = newListeners(count, counter);
+                lists[count] = List.of(arrays[count]);
             }
         }
     }
@@ -147,20 +149,17 @@ public class ListenersNotificationBenchmark {
         }
     }
 
-    /// Creates a list with the given number of listeners, using [Listeners#add(List, Object)].
+    /// Creates an array with the given number of listeners.
     /// Each listener is a different lambda instance, since it captures its own id.
-    private static List<EventListener<EventInfo>> newList(final int listenersCount, final Counter counter) {
-        List<EventListener<EventInfo>> list = List.of();
+    /// The callers create a list with `List.of(array)`, which copies the array, so the list and the array don't share storage.
+    @SuppressWarnings("unchecked")
+    private static EventListener<EventInfo>[] newListeners(final int listenersCount, final Counter counter) {
+        final EventListener<EventInfo>[] listeners = new EventListener[listenersCount];
         for (int i = 0; i < listenersCount; i++) {
             final int id = i + 1;
-            list = Listeners.add(list, info -> counter.calls += id);
+            listeners[i] = info -> counter.calls += id;
         }
 
-        return list;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static EventListener<EventInfo>[] toArray(final List<EventListener<EventInfo>> list) {
-        return Arrays.copyOf(list.toArray(), list.size(), EventListener[].class);
+        return listeners;
     }
 }

@@ -259,26 +259,11 @@
             Builds the benchmarks with CloudSim Plus 8.5.1, to compare it with the current version
             (e.g., to measure memory before the changes from cloudsimplus#586 using ListenersMemoryBenchmark):
                 ./mvnw clean package -Pcloudsimplus-8
-            Benchmarks that use classes only available in CloudSim Plus 9 are excluded.
             -->
             <id>cloudsimplus-8</id>
             <properties>
                 <cloudsimplus.version>8.5.1</cloudsimplus.version>
             </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <!-- Uses the Listeners class, added in CloudSim Plus 9 (to be removed by issue #8) -->
-                                <exclude>org/cloudsimplus/listeners/ListenersNotificationBenchmark.java</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>

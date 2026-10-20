@@ -30,7 +30,7 @@ java -jar target/cloudsimplus-benchmarks-8.5.1-uber.jar -l
 Alternative entry points (run from the IDE or with `exec`/`java -cp`):
 - `org.cloudsimplus.benchmarks.Run` runs every JMH benchmark matching `org.cloudsimplus.` with preset options (1 fork, 5 warmup, 25 measurement iterations, ms, 1 thread).
 - `org.cloudsimplus.benchmarks.SimulationTimeBenchmark` is a plain `main` (not JMH): it runs a full simulation several times, growing Hosts/VMs/Cloudlets each run, and prints execution time.
-- `org.cloudsimplus.listeners.ListenersMemoryBenchmark` is a plain `main` (not JMH): it prints the heap retained by each VM and Host (run it with `-XX:+UseSerialGC`). `scripts/listeners-memory-before-after.sh` builds CloudSim Plus before and after issue #586 (using git worktrees of `../cloudsimplus`) and runs it with each version.
+- `org.cloudsimplus.listeners.ListenersMemoryBenchmark` is a plain `main` (not JMH): it prints the heap retained by each VM and Host (run it with `-XX:+UseSerialGC`). To compare with CloudSim Plus 8.5.1 (before issue #586), build with `./mvnw clean package -Pcloudsimplus-8`, run it, then build without the profile and run it again (see its Javadoc).
 
 There are no unit tests in this project.
 

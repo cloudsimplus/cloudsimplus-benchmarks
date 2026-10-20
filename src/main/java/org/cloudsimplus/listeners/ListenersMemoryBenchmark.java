@@ -47,8 +47,16 @@ import java.util.function.IntFunction;
 ///
 /// The results are only accurate with a stop-the-world GC, where [System#gc()]
 /// does a full collection, so run it with `-XX:+UseSerialGC`.
-/// The `scripts/listeners-memory-before-after.sh` script runs it
-/// with CloudSim Plus built before and after issue #586.
+///
+/// To compare CloudSim Plus 8.5.1 (before #586) with the current version, build and run it once for each version:
+///
+/// ```bash
+/// ./mvnw clean package -Pcloudsimplus-8   # CloudSim Plus 8.5.1
+/// java -XX:+UseSerialGC -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.listeners.ListenersMemoryBenchmark 8.5.1
+///
+/// ./mvnw clean package                    # current CloudSim Plus version
+/// java -XX:+UseSerialGC -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.listeners.ListenersMemoryBenchmark current
+/// ```
 ///
 /// @author Manoel Campos da Silva Filho
 /// @see <a href="https://github.com/cloudsimplus/cloudsimplus/issues/586">CloudSim Plus issue #586</a>

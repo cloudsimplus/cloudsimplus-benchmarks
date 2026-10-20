@@ -21,13 +21,11 @@
  *     You should have received a copy of the GNU General Public License
  *     along with CloudSim Plus. If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- * A set of benchmarks to assess performance of implemented
- * <a href="http://www.wikiwand.com/en/Heuristic">Heuristics</a> that solves a given
- * optimization problem.
- *
- * @author Manoel Campos da Silva Filho
- */
+/// A set of benchmarks to assess performance of implemented
+/// [Heuristics](http://www.wikiwand.com/en/Heuristic) that solves a given
+/// optimization problem.
+///
+/// @author Manoel Campos da Silva Filho
 @NullMarked
 package org.cloudsimplus.benchmarks;
 

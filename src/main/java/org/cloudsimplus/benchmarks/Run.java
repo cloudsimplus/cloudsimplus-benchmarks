@@ -31,26 +31,20 @@ import org.openjdk.jmh.runner.options.VerboseMode;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * Configures parameters for the JMH Micro-benchmarking framework and starts
- * execution of all benchmark classes.
- *
- * To run the benchmarks, clean and build the main project,
- * then, clean and build this project. Finally, run this class.
- *
- * @author Manoel Campos da Silva Filho
- * @see <a href="http://tutorials.jenkov.com/java-performance/jmh.html">JMH - Java Micro-benchmark Harness Tutorial</a>
- * @see <a href="http://java-performance.info/jmh/">Java Performance: JMH</a>
- */
+/// Configures parameters for the JMH Micro-benchmarking framework and starts
+/// execution of all benchmark classes.
+///
+/// To run the benchmarks, clean and build the main project,
+/// then, clean and build this project. Finally, run this class.
+///
+/// @author Manoel Campos da Silva Filho
+/// @see <a href="http://tutorials.jenkov.com/java-performance/jmh.html">JMH - Java Micro-benchmark Harness Tutorial</a>
+/// @see <a href="http://java-performance.info/jmh/">Java Performance: JMH</a>
 public final class Run {
-    /**
-     * Regex to identify classes with benchmarks that have to be executed.
-     */
+    /// Regex to identify classes with benchmarks that have to be executed.
     private static final String TEST_CLASSES_REGEX = "org.cloudsimplus.";
 
-    /**
-     * A private constructor to avoid class instantiation.
-     */
+    /// A private constructor to avoid class instantiation.
     private Run(){}
 
     public static void main(String[] args) throws RunnerException {

@@ -33,15 +33,13 @@ import org.openjdk.jmh.annotations.*;
 
 import java.util.*;
 
-/**
- * A set of benchmarks to measure the performance of managing
- * a collection of ordered {@link SimEvent} using:
- * - a {@link java.util.SortedSet};
- * - a regular {@link java.util.LinkedList} and
- * custom algorithms to ensure order when adding elements.
- *
- * @author Manoel Campos da Silva Filho
- */
+/// A set of benchmarks to measure the performance of managing
+/// a collection of ordered [SimEvent] using:
+/// - a [java.util.SortedSet];
+/// - a regular [java.util.LinkedList] and
+/// custom algorithms to ensure order when adding elements.
+///
+/// @author Manoel Campos da Silva Filho
 @BenchmarkMode({Mode.AverageTime, Mode.Throughput})
 @State(Scope.Thread)
 public class SortedSetVsLinkedList {
@@ -54,13 +52,11 @@ public class SortedSetVsLinkedList {
     private int serial;
     @SuppressWarnings("NullAway.Init") // initialized in doSetup()
     private RandomGenerator prng;
-    /**
-     * Defines the probability to increase or not the {@link #time}
-     * randomly.
-     * Some benchmarks always increase the time while other ones
-     * increase just when a pseudo-random number if lower
-     * than the given probability.
-     */
+    /// Defines the probability to increase or not the [#time]
+    /// randomly.
+    /// Some benchmarks always increase the time while other ones
+    /// increase just when a pseudo-random number if lower
+    /// than the given probability.
     private static final double VALUE_INCREASE_PROBABILITY = 0.7;
 
     @Setup(Level.Iteration)
@@ -73,32 +69,26 @@ public class SortedSetVsLinkedList {
         maxTime = 0;
     }
 
-    /**
-     * Adds an always-incremented value into a {@link TreeSet}.
-     * @return
-     */
+    /// Adds an always-incremented value into a [TreeSet].
+    /// @return
     @Benchmark
     public Collection<SimEvent> testSortedSetAdd() {
         return sortedSetAdd(++time);
     }
 
-    /**
-     * Adds a value into a {@link TreeSet} which
-     * is increased just with a probability defined by {@link #VALUE_INCREASE_PROBABILITY}.
-     * This way, we can benchmark the {@link TreeSet} and {@link LinkedList} when
-     * events for the same time are generated consecutively.
-     * @return
-     */
+    /// Adds a value into a [TreeSet] which
+    /// is increased just with a probability defined by [#VALUE_INCREASE_PROBABILITY].
+    /// This way, we can benchmark the [TreeSet] and [LinkedList] when
+    /// events for the same time are generated consecutively.
+    /// @return
     @Benchmark
     public Collection<SimEvent> testSortedSetAddRandomIncrement() {
         return sortedSetAdd(increaseTimeRandomly());
     }
 
-    /**
-     * Adds an always-incremented value into a {@link LinkedList}
-     * that uses the CloudSimPlus's custom implementation to ensure order.
-     * @return
-     */
+    /// Adds an always-incremented value into a [LinkedList]
+    /// that uses the CloudSimPlus's custom implementation to ensure order.
+    /// @return
     @Benchmark
     public Collection<SimEvent> testCustomLinkedListAdd() {
         return sortedLinkedListAdd(++time);
@@ -109,14 +99,12 @@ public class SortedSetVsLinkedList {
         return sortedLinkedListAddReversed(++time);
     }
 
-    /**
-     * Adds a value into a {@link LinkedList} which
-     * is increased just with a probability defined by {@link #VALUE_INCREASE_PROBABILITY}.
-     * This way, we can benchmark the {@link TreeSet} and {@link LinkedList} when
-     * events for the same time are generated consecutively.
-     * Such a {@link LinkedList} uses the CloudSimPlus's custom implementation to ensure order.
-     * @return
-     */
+    /// Adds a value into a [LinkedList] which
+    /// is increased just with a probability defined by [#VALUE_INCREASE_PROBABILITY].
+    /// This way, we can benchmark the [TreeSet] and [LinkedList] when
+    /// events for the same time are generated consecutively.
+    /// Such a [LinkedList] uses the CloudSimPlus's custom implementation to ensure order.
+    /// @return
     @Benchmark
     public Collection<SimEvent> testCustomLinkedListAddRandomIncrement() {
         return sortedLinkedListAdd(increaseTimeRandomly());
@@ -133,11 +121,9 @@ public class SortedSetVsLinkedList {
         return sortedSet;
     }
 
-    /**
-     * CloudSimPlus's DeferredQueue uses a LinkedList and a custom
-     * algorithm to ensure order when adding elements.
-     * @return
-     */
+    /// CloudSimPlus's DeferredQueue uses a LinkedList and a custom
+    /// algorithm to ensure order when adding elements.
+    /// @return
     private Collection<SimEvent> sortedLinkedListAdd(final double time) {
         if (time >= maxTime) {
             linkedList.add(createEvent(time));
@@ -158,13 +144,11 @@ public class SortedSetVsLinkedList {
         return linkedList;
     }
 
-    /**
-     * An alternative to CloudSimPlus's DeferredQueue that ensures order when adding
-     * elements into a LinkedList. However, this implementations start looking
-     * for the position to add an element from the end of the list,
-     * since the time of the event is usually higher then the previous time.
-     * @return
-     */
+    /// An alternative to CloudSimPlus's DeferredQueue that ensures order when adding
+    /// elements into a LinkedList. However, this implementations start looking
+    /// for the position to add an element from the end of the list,
+    /// since the time of the event is usually higher then the previous time.
+    /// @return
     private Collection<SimEvent> sortedLinkedListAddReversed(final double time) {
         if (time >= maxTime) {
             linkedList.add(createEvent(time));

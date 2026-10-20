@@ -31,11 +31,9 @@ import org.openjdk.jmh.annotations.*;
 
 import java.util.stream.IntStream;
 
-/**
- * A set of benchmarks for the {@link CloudletToVmMappingSolution} class.
- *
- * @author Manoel Campos da Silva Filho
- */
+/// A set of benchmarks for the [CloudletToVmMappingSolution] class.
+///
+/// @author Manoel Campos da Silva Filho
 @BenchmarkMode({Mode.AverageTime, Mode.Throughput})
 @State(Scope.Thread)
 public class CloudletToVmMappingSolutionBenchmark {
@@ -80,15 +78,13 @@ public class CloudletToVmMappingSolutionBenchmark {
         return instance1.getCost(true);
     }
 
-    /**
-     * The second time the getCost method is called
-     * without changing Cloudlets to Vm's mapping,
-     * the fitness will be the same and will not be computed again.
-     * The first time the method is called is in the
-     * {@link #doSetup()} method.
-     *
-     * @return the cost value
-     */
+    /// The second time the getCost method is called
+    /// without changing Cloudlets to Vm's mapping,
+    /// the fitness will be the same and will not be computed again.
+    /// The first time the method is called is in the
+    /// [#doSetup()] method.
+    ///
+    /// @return the cost value
     @Benchmark
     public double testGetCostWhenSecondCall() {
         return instance2.getCost();

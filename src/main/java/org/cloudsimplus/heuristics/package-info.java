@@ -21,14 +21,14 @@
  *     You should have received a copy of the GNU General Public License
  *     along with CloudSim Plus. If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- * A set of benchmarks created using the
- * <a href="http://openjdk.java.net/projects/code-tools/jmh/">JMH (Java Microbenchmark Harness framework)</a>
- * to assess performance of CloudSim Plus features.
- *
- * <p>The main class that starts the benchmarks is the {@link org.cloudsimplus.benchmarks.Run}</p>.
- * @author Manoel Campos da Silva Filho
- */
+/// A set of benchmarks created using the
+/// [JMH (Java Microbenchmark Harness framework)](http://openjdk.java.net/projects/code-tools/jmh/)
+/// to assess performance of CloudSim Plus features.
+///
+/// The main class that starts the benchmarks is the [org.cloudsimplus.benchmarks.Run]
+///
+/// .
+/// @author Manoel Campos da Silva Filho
 @NullMarked
 package org.cloudsimplus.heuristics;
 

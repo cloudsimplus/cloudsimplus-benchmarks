@@ -21,8 +21,9 @@
  *     You should have received a copy of the GNU General Public License
  *     along with CloudSim Plus. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cloudsimplus.listeners;
+package org.cloudsimplus.benchmarks;
 
+import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.hosts.HostSimple;
 import org.cloudsimplus.resources.PeSimple;
 import org.cloudsimplus.vms.VmSimple;
@@ -34,10 +35,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntFunction;
 
-/// Measures the heap retained by each VM and Host, to compare the memory used
-/// before and after the listener lists became the shared `List.of()` (issue #586).
-/// Before that, each VM created 6 empty `ArrayList`s and each Host created
-/// 2 empty `ArrayList`s and 1 empty `HashSet`, even when no listener was added.
+/// Measures the heap retained by each VM, Host and Cloudlet (their memory footprint),
+/// to compare CloudSim Plus versions. Since it measures the whole object (with everything it references),
+/// it includes all changes that affect the footprint, such as:
+/// - [#586](https://github.com/cloudsimplus/cloudsimplus/issues/586): listener lists start as the shared `List.of()`.
+///   Before that, each VM created 6 empty `ArrayList`s and each Host created
+///   2 empty `ArrayList`s and 1 empty `HashSet`, even when no listener was added.
+/// - [#587](https://github.com/cloudsimplus/cloudsimplus/issues/587): reduces the Cloudlet footprint.
+///   Before that, each Cloudlet created 3 empty listener `HashSet`s, an empty `requiredFiles` `LinkedList`
+///   and a new `UtilizationModelFull` for its CPU. Now, the listener and `requiredFiles` lists start as the shared `List.of()`,
+///   and the CPU uses the shared `UtilizationModel.FULL`.
 ///
 /// It's a plain `main` (not JMH), since JMH measures time and allocation rate,
 /// but here we need the memory that stays in the heap after the objects are created.
@@ -48,20 +55,19 @@ import java.util.function.IntFunction;
 /// The results are only accurate with a stop-the-world GC, where [System#gc()]
 /// does a full collection, so run it with `-XX:+UseSerialGC`.
 ///
-/// To compare CloudSim Plus 8.5.1 (before #586) with the current version, build and run it once for each version:
+/// To compare CloudSim Plus 8.5.1 (before #586 and #587) with the current version, build and run it once for each version:
 ///
 /// ```bash
 /// ./mvnw clean package -Pcloudsimplus-8   # CloudSim Plus 8.5.1
-/// java -XX:+UseSerialGC -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.listeners.ListenersMemoryBenchmark 8.5.1
+/// java -XX:+UseSerialGC -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.benchmarks.MemoryFootprintBenchmark 8.5.1
 ///
 /// ./mvnw clean package                    # current CloudSim Plus version
-/// java -XX:+UseSerialGC -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.listeners.ListenersMemoryBenchmark current
+/// java -XX:+UseSerialGC -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.benchmarks.MemoryFootprintBenchmark current
 /// ```
 ///
 /// @author Manoel Campos da Silva Filho
-/// @see <a href="https://github.com/cloudsimplus/cloudsimplus/issues/586">CloudSim Plus issue #586</a>
 /// @see <a href="https://github.com/cloudsimplus/cloudsimplus/issues/523">CloudSim Plus issue #523</a>
-public final class ListenersMemoryBenchmark {
+public final class MemoryFootprintBenchmark {
     /// Number of objects of each type created in each round.
     private static final int OBJECTS = 100_000;
 
@@ -80,20 +86,24 @@ public final class ListenersMemoryBenchmark {
     private static final long HOST_BW = 10_000;
     private static final long HOST_STORAGE = 100_000;
 
+    private static final long CLOUDLET_LENGTH = 10_000;
+    private static final int CLOUDLET_PES = 1;
+
     private static final MemoryMXBean MEMORY = ManagementFactory.getMemoryMXBean();
 
     /// A private constructor to avoid class instantiation.
-    private ListenersMemoryBenchmark(){}
+    private MemoryFootprintBenchmark(){}
 
     /// Runs the benchmark.
     /// @param args an optional label to identify the CloudSim Plus version being measured (e.g., "before" or "after")
     public static void main(final String[] args) {
         final String label = args.length > 0 ? args[0] : "current";
         System.out.printf("%s (%s): %,d objects per round, median of %d rounds%n",
-                ListenersMemoryBenchmark.class.getSimpleName(), label, OBJECTS, ROUNDS);
+                MemoryFootprintBenchmark.class.getSimpleName(), label, OBJECTS, ROUNDS);
 
-        printResult("VmSimple", measure(ListenersMemoryBenchmark::newVm));
-        printResult("HostSimple", measure(ListenersMemoryBenchmark::newHost));
+        printResult("VmSimple", measure(MemoryFootprintBenchmark::newVm));
+        printResult("HostSimple", measure(MemoryFootprintBenchmark::newHost));
+        printResult("CloudletSimple", measure(MemoryFootprintBenchmark::newCloudlet));
     }
 
     private static VmSimple newVm(final int index) {
@@ -104,6 +114,11 @@ public final class ListenersMemoryBenchmark {
     /// The PE is included in the measured size, but it's the same before and after the change.
     private static HostSimple newHost(final int index) {
         return new HostSimple(HOST_RAM, HOST_BW, HOST_STORAGE, List.of(new PeSimple(PE_MIPS)));
+    }
+
+    /// Creates a Cloudlet with the default utilization models.
+    private static CloudletSimple newCloudlet(final int index) {
+        return new CloudletSimple(CLOUDLET_LENGTH, CLOUDLET_PES);
     }
 
     /// {@return the median heap (in bytes) retained by each object created by a given function}
@@ -148,6 +163,6 @@ public final class ListenersMemoryBenchmark {
     }
 
     private static void printResult(final String className, final double bytesPerObject) {
-        System.out.printf("  %-10s %8.1f bytes per object%n", className, bytesPerObject);
+        System.out.printf("  %-14s %8.1f bytes per object%n", className, bytesPerObject);
     }
 }

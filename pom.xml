@@ -78,15 +78,10 @@
         <dependency>
             <groupId>org.cloudsimplus</groupId>
             <artifactId>cloudsimplus</artifactId>
-            <version>${project.version}</version>
+            <version>${cloudsimplus.version}</version>
+            <!-- Also brings logback (and slf4j-api), with the versions each CloudSim Plus version was built with -->
         </dependency>
 
-        <dependency>
-            <!-- Automatically includes slf4j-api 2.0 -->
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.4.5</version>
-        </dependency>
         <dependency>
             <!--
             JSpecify annotations (such as @Nullable) to indicate values that may be null.
@@ -100,6 +95,8 @@
     </dependencies>
 
     <properties>
+        <!-- CloudSim Plus version to benchmark. It can be changed by the cloudsimplus-8 profile. -->
+        <cloudsimplus.version>${project.version}</cloudsimplus.version>
         <errorprone.version>2.50.0</errorprone.version>
         <nullaway.version>0.14.2</nullaway.version>
         <jspecify.version>1.0.0</jspecify.version>
@@ -255,4 +252,18 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <!--
+            Builds the benchmarks with CloudSim Plus 8.5.1, to compare it with the current version
+            (e.g., to measure memory before the changes from cloudsimplus#586 using ListenersMemoryBenchmark):
+                ./mvnw clean package -Pcloudsimplus-8
+            -->
+            <id>cloudsimplus-8</id>
+            <properties>
+                <cloudsimplus.version>8.5.1</cloudsimplus.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>

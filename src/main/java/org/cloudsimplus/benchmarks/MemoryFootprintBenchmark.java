@@ -25,7 +25,7 @@ package org.cloudsimplus.benchmarks;
 
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.hosts.HostSimple;
-import org.cloudsimplus.resources.PeSimple;
+import org.cloudsimplus.resources.CoreCapacity;
 import org.cloudsimplus.vms.VmSimple;
 
 import java.lang.management.ManagementFactory;
@@ -79,15 +79,15 @@ public final class MemoryFootprintBenchmark {
     private static final int GC_CALLS = 3;
 
     private static final double VM_MIPS = 1000;
-    private static final long VM_PES = 1;
+    private static final long VM_CORES = 1;
 
-    private static final double PE_MIPS = 1000;
+    private static final double HOST_CORE_MIPS = 1000;
     private static final long HOST_RAM = 4096;
     private static final long HOST_BW = 10_000;
     private static final long HOST_STORAGE = 100_000;
 
     private static final long CLOUDLET_LENGTH = 10_000;
-    private static final int CLOUDLET_PES = 1;
+    private static final int CLOUDLET_CORES = 1;
 
     private static final MemoryMXBean MEMORY = ManagementFactory.getMemoryMXBean();
 
@@ -107,18 +107,18 @@ public final class MemoryFootprintBenchmark {
     }
 
     private static VmSimple newVm(final int index) {
-        return new VmSimple(VM_MIPS, VM_PES);
+        return new VmSimple(new CoreCapacity(VM_CORES, VM_MIPS));
     }
 
-    /// Creates a Host with a single PE.
-    /// The PE is included in the measured size, but it's the same before and after the change.
+    /// Creates a Host with a single CPU core.
+    /// The Host Processor is included in the measured size.
     private static HostSimple newHost(final int index) {
-        return new HostSimple(HOST_RAM, HOST_BW, HOST_STORAGE, List.of(new PeSimple(PE_MIPS)));
+        return new HostSimple(HOST_RAM, HOST_BW, HOST_STORAGE, new CoreCapacity(HOST_CORE_MIPS));
     }
 
     /// Creates a Cloudlet with the default utilization models.
     private static CloudletSimple newCloudlet(final int index) {
-        return new CloudletSimple(CLOUDLET_LENGTH, CLOUDLET_PES);
+        return new CloudletSimple(CLOUDLET_LENGTH, CLOUDLET_CORES);
     }
 
     /// {@return the median heap (in bytes) retained by each object created by a given function}

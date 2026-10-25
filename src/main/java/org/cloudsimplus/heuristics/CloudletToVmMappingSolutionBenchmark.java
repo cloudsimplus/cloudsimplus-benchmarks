@@ -25,6 +25,7 @@ package org.cloudsimplus.heuristics;
 
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.distributions.UniformDistr;
+import org.cloudsimplus.resources.CoreCapacity;
 import org.cloudsimplus.utilizationmodels.UtilizationModel;
 import org.cloudsimplus.vms.VmSimple;
 import org.openjdk.jmh.annotations.*;
@@ -62,7 +63,7 @@ public class CloudletToVmMappingSolutionBenchmark {
         IntStream.range(0, 100).forEach(i
                 -> result.bindCloudletToVm(
                         new CloudletSimple(i, 1, 1).setUtilizationModel(um),
-                        new VmSimple(i, 1000, 1))
+                        new VmSimple(i, new CoreCapacity(1, 1000)))
         );
 
         return result;

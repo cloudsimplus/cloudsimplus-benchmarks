@@ -133,7 +133,7 @@ public class SimulationTimeBenchmark {
             hostList.add(host);
         }
 
-        //Uses a VmAllocationPolicySimple by default to allocate VMs
+        //Uses a VmPlacementPolicySimple by default to place VMs
         return new DatacenterSimple(simulation, hostList).setSchedulingInterval(-1);
     }
 
@@ -145,7 +145,7 @@ public class SimulationTimeBenchmark {
         final long storage = 1000000*HOST_CORES; //in Megabytes
 
         /*
-        Uses ResourceProvisionerSimple by default for RAM and BW provisioning
+        Uses ResourceAllocatorSimple by default for RAM and BW allocation
         and VmSchedulerSpaceShared for VM scheduling.
         */
         return new HostSimple(ram, bw, storage, cpuCapacity);

@@ -23,7 +23,7 @@
  */
 package org.cloudsimplus.benchmarks;
 
-import org.cloudsimplus.allocationpolicies.VmAllocationPolicyBestFit;
+import org.cloudsimplus.placementpolicies.VmPlacementPolicyBestFit;
 import org.cloudsimplus.brokers.DatacenterBroker;
 import org.cloudsimplus.brokers.DatacenterBrokerSimple;
 import org.cloudsimplus.cloudlets.Cloudlet;
@@ -78,7 +78,7 @@ final class ProcessorScenario {
 
     ProcessorScenario() {
         simulation = new CloudSimPlus();
-        final var datacenter = new DatacenterSimple(simulation, createHosts(), new VmAllocationPolicyBestFit());
+        final var datacenter = new DatacenterSimple(simulation, createHosts(), new VmPlacementPolicyBestFit());
         datacenter.setSchedulingInterval(1);
 
         final DatacenterBroker broker = new DatacenterBrokerSimple(simulation);

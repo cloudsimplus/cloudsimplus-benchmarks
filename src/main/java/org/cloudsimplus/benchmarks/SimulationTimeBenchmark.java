@@ -32,8 +32,7 @@ import org.cloudsimplus.datacenters.Datacenter;
 import org.cloudsimplus.datacenters.DatacenterSimple;
 import org.cloudsimplus.hosts.Host;
 import org.cloudsimplus.hosts.HostSimple;
-import org.cloudsimplus.resources.Pe;
-import org.cloudsimplus.resources.PeSimple;
+import org.cloudsimplus.resources.CoreCapacity;
 import org.cloudsimplus.util.Log;
 import org.cloudsimplus.util.TimeUtil;
 import org.cloudsimplus.utilizationmodels.UtilizationModelDynamic;
@@ -60,13 +59,13 @@ public class SimulationTimeBenchmark {
     public static final int SIMULATIONS = 4;
     public static final int HOSTS_INCREMENT = 100;
     public static final int INITIAL_HOSTS_NUMBER = 100;
-    private static final int HOST_PES = 64;
+    private static final int HOST_CORES = 64;
 
-    private static final int VM_PES = 1;
+    private static final int VM_CORES = 1;
     /// Value used to multiply the number of VMs to get the number of Cloudlets.
     private static final int VMS_MULTIPLIER = 55;
 
-    private static final int CLOUDLET_PES = 1;
+    private static final int CLOUDLET_CORES = 1;
     private static final int CLOUDLET_LENGTH = 1000;
 
     private final int hostsNumber;
@@ -139,22 +138,17 @@ public class SimulationTimeBenchmark {
     }
 
     private Host createHost() {
-        final List<Pe> peList = new ArrayList<>(HOST_PES);
-        //List of Host's CPUs (Processing Elements, PEs)
-        for (int i = 0; i < HOST_PES; i++) {
-            //Uses a PeProvisionerSimple by default to provision PEs for VMs
-            peList.add(new PeSimple(1000));
-        }
+        final var cpuCapacity = new CoreCapacity(HOST_CORES, 1000);
 
-        final long ram = 4096*HOST_PES; //in Megabytes
-        final long bw = 100000*HOST_PES; //in Megabits/s
-        final long storage = 1000000*HOST_PES; //in Megabytes
+        final long ram = 4096*HOST_CORES; //in Megabytes
+        final long bw = 100000*HOST_CORES; //in Megabits/s
+        final long storage = 1000000*HOST_CORES; //in Megabytes
 
         /*
         Uses ResourceProvisionerSimple by default for RAM and BW provisioning
         and VmSchedulerSpaceShared for VM scheduling.
         */
-        return new HostSimple(ram, bw, storage, peList);
+        return new HostSimple(ram, bw, storage, cpuCapacity);
     }
 
     /// Creates a list of VMs.
@@ -162,7 +156,7 @@ public class SimulationTimeBenchmark {
         final List<Vm> list = new ArrayList<>(vmsNumber);
         for (int i = 0; i < vmsNumber; i++) {
             //Uses a CloudletSchedulerTimeShared by default to schedule Cloudlets
-            final Vm vm = new VmSimple(1000, VM_PES);
+            final Vm vm = new VmSimple(new CoreCapacity(VM_CORES, 1000));
             vm.setRam(512).setBw(1000).setSize(10000);
             list.add(vm);
         }
@@ -178,7 +172,7 @@ public class SimulationTimeBenchmark {
         final UtilizationModelDynamic utilizationModel = new UtilizationModelDynamic(0.5);
 
         for (int i = 0; i < cloudletsNumber; i++) {
-            final Cloudlet cloudlet = new CloudletSimple(CLOUDLET_LENGTH, CLOUDLET_PES, utilizationModel);
+            final Cloudlet cloudlet = new CloudletSimple(CLOUDLET_LENGTH, CLOUDLET_CORES, utilizationModel);
             cloudlet.setSizes(1024);
             list.add(cloudlet);
         }

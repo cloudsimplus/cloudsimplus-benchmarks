@@ -25,14 +25,8 @@ package org.cloudsimplus.benchmarks;
 
 import org.cloudsimplus.cloudlets.CloudletSimple;
 import org.cloudsimplus.hosts.HostSimple;
-import org.cloudsimplus.resources.CoreCapacity;
 import org.cloudsimplus.vms.VmSimple;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.ref.Reference;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.IntFunction;
 
 /// Measures the heap retained by each VM, Host and Cloudlet (their memory footprint),
@@ -48,21 +42,20 @@ import java.util.function.IntFunction;
 ///
 /// It's a plain `main` (not JMH), since JMH measures time and allocation rate,
 /// but here we need the memory that stays in the heap after the objects are created.
-/// It creates [#OBJECTS] objects, keeps them in an array and measures the used heap
-/// after a GC, before and after creating them. The difference divided by the number of objects
-/// is the heap retained by each object. This is repeated [#ROUNDS] times and the median is shown.
+/// It creates [#OBJECTS] objects in each of [#ROUNDS] rounds and shows the median
+/// heap retained by each object (see [HeapMeter]).
 ///
-/// The results are only accurate with a stop-the-world GC, where [System#gc()]
-/// does a full collection, so run it with `-XX:+UseSerialGC`.
+/// To measure the footprint reduction from
+/// [#595](https://github.com/cloudsimplus/cloudsimplus/pull/595) for different numbers of cores, use [ProcessorBenchmark].
 ///
 /// To compare CloudSim Plus 8.5.1 (before #586 and #587) with the current version, build and run it once for each version:
 ///
 /// ```bash
 /// ./mvnw clean package -Pcloudsimplus-8   # CloudSim Plus 8.5.1
-/// java -XX:+UseSerialGC -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.benchmarks.MemoryFootprintBenchmark 8.5.1
+/// java -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.benchmarks.MemoryFootprintBenchmark 8.5.1
 ///
 /// ./mvnw clean package                    # current CloudSim Plus version
-/// java -XX:+UseSerialGC -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.benchmarks.MemoryFootprintBenchmark current
+/// java -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.benchmarks.MemoryFootprintBenchmark current
 /// ```
 ///
 /// @author Manoel Campos da Silva Filho
@@ -74,9 +67,6 @@ public final class MemoryFootprintBenchmark {
     /// Number of times each measurement is repeated.
     private static final int ROUNDS = 5;
 
-    /// Number of times [System#gc()] is called before reading the used heap,
-    /// so that objects waiting for finalization or in reference queues are also collected.
-    private static final int GC_CALLS = 3;
 
     private static final double VM_MIPS = 1000;
     private static final long VM_CORES = 1;
@@ -88,8 +78,6 @@ public final class MemoryFootprintBenchmark {
 
     private static final long CLOUDLET_LENGTH = 10_000;
     private static final int CLOUDLET_CORES = 1;
-
-    private static final MemoryMXBean MEMORY = ManagementFactory.getMemoryMXBean();
 
     /// A private constructor to avoid class instantiation.
     private MemoryFootprintBenchmark(){}
@@ -107,13 +95,13 @@ public final class MemoryFootprintBenchmark {
     }
 
     private static VmSimple newVm(final int index) {
-        return new VmSimple(new CoreCapacity(VM_CORES, VM_MIPS));
+        return ProcessorScenario.newVm(VM_CORES, VM_MIPS);
     }
 
     /// Creates a Host with a single CPU core.
     /// The Host Processor is included in the measured size.
     private static HostSimple newHost(final int index) {
-        return new HostSimple(HOST_RAM, HOST_BW, HOST_STORAGE, new CoreCapacity(HOST_CORE_MIPS));
+        return ProcessorScenario.newHost(HOST_RAM, HOST_BW, HOST_STORAGE, 1, HOST_CORE_MIPS);
     }
 
     /// Creates a Cloudlet with the default utilization models.
@@ -123,43 +111,8 @@ public final class MemoryFootprintBenchmark {
 
     /// {@return the median heap (in bytes) retained by each object created by a given function}
     /// @param factory a function that creates an object for a given index
-    private static double measure(final IntFunction<Object> factory) {
-        final double[] bytesPerObject = new double[ROUNDS];
-        for (int round = 0; round < ROUNDS; round++) {
-            bytesPerObject[round] = measureRound(factory);
-        }
-
-        return median(bytesPerObject);
-    }
-
-    /// {@return the heap (in bytes) retained by each object created by a given function in a single round}
-    /// The array that keeps the objects alive is created before the first reading,
-    /// so it isn't included in the measured size.
-    private static double measureRound(final IntFunction<Object> factory) {
-        final Object[] objects = new Object[OBJECTS];
-        final long usedBefore = usedHeapAfterGc();
-        for (int i = 0; i < OBJECTS; i++) {
-            objects[i] = factory.apply(i);
-        }
-
-        final long usedAfter = usedHeapAfterGc();
-        Reference.reachabilityFence(objects);
-        return (usedAfter - usedBefore) / (double) OBJECTS;
-    }
-
-    private static long usedHeapAfterGc() {
-        for (int i = 0; i < GC_CALLS; i++) {
-            System.gc();
-        }
-
-        return MEMORY.getHeapMemoryUsage().getUsed();
-    }
-
-    private static double median(final double[] values) {
-        final double[] sorted = values.clone();
-        Arrays.sort(sorted);
-        final int middle = sorted.length / 2;
-        return sorted.length % 2 == 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
+    private static double measure(final IntFunction<?> factory) {
+        return HeapMeter.bytesPerObject(factory, OBJECTS, ROUNDS);
     }
 
     private static void printResult(final String className, final double bytesPerObject) {

@@ -32,8 +32,7 @@ import org.cloudsimplus.core.CloudSimPlus;
 import org.cloudsimplus.datacenters.DatacenterSimple;
 import org.cloudsimplus.hosts.Host;
 import org.cloudsimplus.hosts.HostSimple;
-import org.cloudsimplus.resources.Pe;
-import org.cloudsimplus.resources.PeSimple;
+import org.cloudsimplus.resources.CoreCapacity;
 import org.cloudsimplus.schedulers.vm.VmSchedulerTimeShared;
 import org.cloudsimplus.vms.Vm;
 import org.cloudsimplus.vms.VmSimple;
@@ -45,7 +44,8 @@ import java.util.List;
 /// It's built when the object is created and executed by [#run()].
 ///
 /// Hosts and VMs are created only by [#newHost(long, long, long, long, double)] and [#newVm(long, double)],
-/// which use the CloudSim Plus API where a Host has a `List<Pe>`, with one [Pe] object per CPU core.
+/// which use the CloudSim Plus API where each machine has a single
+/// [org.cloudsimplus.resources.Processor] that just counts its cores.
 ///
 /// Cloudlets have different lengths, so they finish at different times.
 /// This way, the simulation processes many events that change the number of
@@ -134,18 +134,13 @@ final class ProcessorScenario {
     /// @param cores the number of CPU cores
     /// @param mips the MIPS capacity of each core
     static HostSimple newHost(final long ram, final long bw, final long storage, final long cores, final double mips) {
-        final List<Pe> peList = new ArrayList<>((int) cores);
-        for (int i = 0; i < cores; i++) {
-            peList.add(new PeSimple(mips));
-        }
-
-        return new HostSimple(ram, bw, storage, peList);
+        return new HostSimple(ram, bw, storage, new CoreCapacity(cores, mips));
     }
 
     /// {@return a new VM}
     /// @param cores the number of CPU cores
     /// @param mips the MIPS capacity of each core
     static VmSimple newVm(final long cores, final double mips) {
-        return new VmSimple(mips, cores);
+        return new VmSimple(new CoreCapacity(cores, mips));
     }
 }

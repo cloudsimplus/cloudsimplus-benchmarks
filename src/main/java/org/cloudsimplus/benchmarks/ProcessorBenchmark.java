@@ -47,15 +47,16 @@ import static org.cloudsimplus.benchmarks.ProcessorScenario.*;
 /// It's a plain `main` (not JMH), since JMH measures time and allocation rate,
 /// but here we also need the memory that stays in the heap.
 ///
-/// This version uses the CloudSim Plus API before #595, where each Host has a `List<Pe>`.
-/// Run it with CloudSim Plus built from the commit right before #595:
+/// This version uses the current CloudSim Plus API, where each machine has a single `Processor`:
 ///
 /// ```bash
-/// git -C ../cloudsimplus checkout 9bb9de25c
-/// (cd ../cloudsimplus && ./mvnw install -DskipTests)
 /// ./mvnw clean package
 /// java -Xmx4g -cp target/cloudsimplus-benchmarks-*-uber.jar org.cloudsimplus.benchmarks.ProcessorBenchmark
 /// ```
+///
+/// The numbers before #595 were got by running the first version of this benchmark
+/// (which used the `List<Pe>` API) with CloudSim Plus built from commit 9bb9de25c.
+/// Both results are in the README.
 ///
 /// @author Manoel Campos da Silva Filho
 public final class ProcessorBenchmark {
@@ -80,7 +81,7 @@ public final class ProcessorBenchmark {
     private static final long HOST_STORAGE = 100_000;
 
     /// A description of the CloudSim Plus API used to create Hosts and VMs.
-    private static final String API = "List<Pe> (before cloudsimplus#595)";
+    private static final String API = "single Processor (cloudsimplus#595)";
 
     /// A private constructor to avoid class instantiation.
     private ProcessorBenchmark(){}

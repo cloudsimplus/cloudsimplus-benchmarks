@@ -78,7 +78,7 @@ final class ProcessorScenario {
 
     ProcessorScenario() {
         simulation = new CloudSimPlus();
-        final var datacenter = new DatacenterSimple(simulation, createHosts(), new VmPlacementPolicyBestFit());
+        final var datacenter = DatacenterSimple.of(simulation, createHosts(), new VmPlacementPolicyBestFit());
         datacenter.setSchedulingInterval(1);
 
         final DatacenterBroker broker = new DatacenterBrokerSimple(simulation);
@@ -121,7 +121,7 @@ final class ProcessorScenario {
         final var cloudlets = new ArrayList<Cloudlet>(count);
         for (int i = 0; i < count; i++) {
             final long length = CLOUDLET_MIN_LENGTH * (1 + i % CLOUDLET_LENGTHS);
-            cloudlets.add(new CloudletSimple(length, CLOUDLET_CORES));
+            cloudlets.add(CloudletSimple.of(length, CLOUDLET_CORES));
         }
 
         return cloudlets;
@@ -133,14 +133,14 @@ final class ProcessorScenario {
     /// @param storage the storage capacity (in Megabytes)
     /// @param cores the number of CPU cores
     /// @param mips the MIPS capacity of each core
-    static HostSimple newHost(final long ram, final long bw, final long storage, final long cores, final double mips) {
-        return new HostSimple(ram, bw, storage, new CoreCapacity(cores, mips));
+    static Host newHost(final long ram, final long bw, final long storage, final long cores, final double mips) {
+        return HostSimple.of(ram, bw, storage, new CoreCapacity(cores, mips));
     }
 
     /// {@return a new VM}
     /// @param cores the number of CPU cores
     /// @param mips the MIPS capacity of each core
-    static VmSimple newVm(final long cores, final double mips) {
-        return new VmSimple(new CoreCapacity(cores, mips));
+    static Vm newVm(final long cores, final double mips) {
+        return VmSimple.of(new CoreCapacity(cores, mips));
     }
 }

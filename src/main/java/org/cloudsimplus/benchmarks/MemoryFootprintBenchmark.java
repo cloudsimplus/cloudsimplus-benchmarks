@@ -23,9 +23,10 @@
  */
 package org.cloudsimplus.benchmarks;
 
+import org.cloudsimplus.cloudlets.Cloudlet;
 import org.cloudsimplus.cloudlets.CloudletSimple;
-import org.cloudsimplus.hosts.HostSimple;
-import org.cloudsimplus.vms.VmSimple;
+import org.cloudsimplus.hosts.Host;
+import org.cloudsimplus.vms.Vm;
 
 import java.util.function.IntFunction;
 
@@ -94,19 +95,19 @@ public final class MemoryFootprintBenchmark {
         printResult("CloudletSimple", measure(MemoryFootprintBenchmark::newCloudlet));
     }
 
-    private static VmSimple newVm(final int index) {
+    private static Vm newVm(final int index) {
         return ProcessorScenario.newVm(VM_CORES, VM_MIPS);
     }
 
     /// Creates a Host with a single CPU core.
     /// The Host Processor is included in the measured size.
-    private static HostSimple newHost(final int index) {
+    private static Host newHost(final int index) {
         return ProcessorScenario.newHost(HOST_RAM, HOST_BW, HOST_STORAGE, 1, HOST_CORE_MIPS);
     }
 
     /// Creates a Cloudlet with the default utilization models.
-    private static CloudletSimple newCloudlet(final int index) {
-        return new CloudletSimple(CLOUDLET_LENGTH, CLOUDLET_CORES);
+    private static Cloudlet newCloudlet(final int index) {
+        return CloudletSimple.of(CLOUDLET_LENGTH, CLOUDLET_CORES);
     }
 
     /// {@return the median heap (in bytes) retained by each object created by a given function}

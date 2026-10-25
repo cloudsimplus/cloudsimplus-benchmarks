@@ -17,5 +17,14 @@ jobs:
           distribution: 'corretto'
           java-version: 25
           cache: 'maven'
+      - name: Install CloudSim Plus before cloudsimplus#595
+        # The benchmarks use the CloudSim Plus API before cloudsimplus#595 (a List<Pe> per Host),
+        # which isn't published. So it's built from the commit right before that PR.
+        # Remove this step (and -nsu below) when the benchmarks use the API after #595.
+        run: |
+          git clone --quiet --filter=blob:none https://github.com/cloudsimplus/cloudsimplus.git "$RUNNER_TEMP/cloudsimplus"
+          git -C "$RUNNER_TEMP/cloudsimplus" checkout --quiet 9bb9de25c
+          mvn -B -q -f "$RUNNER_TEMP/cloudsimplus/pom.xml" install -DskipTests -Dmaven.javadoc.skip=true -Dgpg.skip
       - name: Maven Build
-        run: mvn -B package
+        # -nsu (no snapshot updates) avoids replacing the CloudSim Plus installed above by the published 9.0.0-SNAPSHOT.
+        run: mvn -B -nsu package

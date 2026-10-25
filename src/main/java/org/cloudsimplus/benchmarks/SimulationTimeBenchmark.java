@@ -134,7 +134,7 @@ public class SimulationTimeBenchmark {
         }
 
         //Uses a VmPlacementPolicySimple by default to place VMs
-        return new DatacenterSimple(simulation, hostList).setSchedulingInterval(-1);
+        return DatacenterSimple.of(simulation, hostList).setSchedulingInterval(-1);
     }
 
     private Host createHost() {
@@ -148,7 +148,7 @@ public class SimulationTimeBenchmark {
         Uses ResourceAllocatorSimple by default for RAM and BW allocation
         and VmSchedulerSpaceShared for VM scheduling.
         */
-        return new HostSimple(ram, bw, storage, cpuCapacity);
+        return HostSimple.of(ram, bw, storage, cpuCapacity);
     }
 
     /// Creates a list of VMs.
@@ -156,7 +156,7 @@ public class SimulationTimeBenchmark {
         final List<Vm> list = new ArrayList<>(vmsNumber);
         for (int i = 0; i < vmsNumber; i++) {
             //Uses a CloudletSchedulerTimeShared by default to schedule Cloudlets
-            final Vm vm = new VmSimple(new CoreCapacity(VM_CORES, 1000));
+            final Vm vm = VmSimple.of(new CoreCapacity(VM_CORES, 1000));
             vm.setRam(512).setBw(1000).setSize(10000);
             list.add(vm);
         }
@@ -172,7 +172,7 @@ public class SimulationTimeBenchmark {
         final UtilizationModelDynamic utilizationModel = new UtilizationModelDynamic(0.5);
 
         for (int i = 0; i < cloudletsNumber; i++) {
-            final Cloudlet cloudlet = new CloudletSimple(CLOUDLET_LENGTH, CLOUDLET_CORES, utilizationModel);
+            final Cloudlet cloudlet = CloudletSimple.of(CLOUDLET_LENGTH, CLOUDLET_CORES, utilizationModel);
             cloudlet.setSizes(1024);
             list.add(cloudlet);
         }

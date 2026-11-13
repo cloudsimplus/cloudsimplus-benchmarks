@@ -89,3 +89,21 @@ Each configuration is compared with the usual case before #603: a new `CoreCapac
 | **Shared instances, after**                        | **7,114.6 KB** | **815.7 KB (10.3%)** |        **209 B** |
 
 Of the 209 bytes saved per VM, 175 come from sharing the `BootModel` and its two `UtilizationModel`s, which #603 makes safe, and 34 come from #603 itself (shared before → shared after), since a VM's MIPS share is no longer a new `CoreCapacity`.
+
+## Results of `MigrationCheckBenchmark` (cloudsimplus#94)
+
+`MigrationCheckBenchmark` measures one VM migration check: a call to `VmPlacementPolicyMigrationAbstract.getOptimizedPlacementMap()`, which finds the VMs to migrate from overloaded and underloaded Hosts and their target Hosts. It's the baseline for [cloudsimplus#94](https://github.com/cloudsimplus/cloudsimplus/issues/94), where the check creates and destroys VMs to compute the migration map, and for [cloudsimplus#648](https://github.com/cloudsimplus/cloudsimplus/issues/648), the quadratic costs of the placement algorithm itself.
+
+Scenario: Hosts with 8 cores. In each group of 10 Hosts, 1 is overloaded (4 VMs using 100% of the CPU), 1 is underloaded (a VM with 1 core) and 8 use half of their CPU (2 VMs with 2 cores), so there are 2.1 VMs per Host. A `VmPlacementPolicyMigrationStaticThreshold` (thresholds 0.8 and 0.2) with `VmSelectionPolicyMinimumUtilization` performs the check.
+
+- **Before #94:** CloudSim Plus `master` at `4a160b4bb`.
+- JDK 25.0.4, JMH 1.35, default GC, 1 fork, 5 warmup and 10 measurement iterations of 2 seconds, `-prof gc`.
+
+| Hosts |   VMs | Time per check (ms) | Allocated per check (MB) |
+| ----: | ----: | ------------------: | -----------------------: |
+|   100 |   210 |       4.07 ± 0.07   |                     18.3 |
+|   500 | 1,050 |     102.75 ± 2.35   |                    454.9 |
+| 1,000 | 2,100 |     428.46 ± 14.58  |                  1,818.2 |
+| 2,000 | 4,200 |   1,802.05 ± 31.41  |                  7,268.5 |
+
+Both the time and the memory allocated by a check grow quadratically: doubling the number of Hosts makes a check about 4 times slower and allocate about 4 times more memory. A simulation runs one check at each scheduling interval while some Host is under or overloaded.

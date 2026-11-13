@@ -50,3 +50,42 @@ Scenario: 1,000 Hosts with 32 cores, 4,000 VMs with 8 cores and 8,000 Cloudlets 
 | Heap retained before running |  9.6 MB |  5.5 MB |       43% |
 | Heap retained after running  | 12.2 MB |  8.6 MB |       30% |
 | Simulation time              | 1.691 s | 0.776 s |       54% |
+
+## Results of `SharedConfigBenchmark` (cloudsimplus#603)
+
+`SharedConfigBenchmark` measures the memory footprint reduction from [cloudsimplus#603](https://github.com/cloudsimplus/cloudsimplus/issues/603), where configuration values are immutable, so one instance can be safely shared by many machines:
+
+- `ProcessorSimple` keeps the `CoreCapacity` given to it, and `CpuCap.limit()` returns that object while the VM requests its full capacity. Before, each VM kept a new `CoreCapacity` as its MIPS share.
+- `BootModel` is an immutable record, so one instance can be shared by all VMs. Before, it had setters, so each VM needed its own instance.
+
+It compares machines that get their own `CoreCapacity` and `BootModel` with machines that share them. Each VM's `BootModel` has a `UtilizationModelDynamic` for CPU (50%) and another for RAM (30%), as `VmBootTimeAndOverheadExample` used to create for each VM. These models have no update function, so they are stateless and can be shared (see cloudsimplus#650).
+
+- **Before:** CloudSim Plus `master` at `dc0816a29`.
+- **After:** CloudSim Plus with #603.
+- JDK 25, default GC, `-Xmx4g`. Each value is the median of 5 rounds. The values change up to about 15 KB between runs.
+
+### Heap retained by each machine just created (bytes)
+
+| `CoreCapacity` (and `BootModel` for VMs)          |  Host |    VM | VM reduction vs. usual case before |
+| ------------------------------------------------- | ----: | ----: | ---------------------------------: |
+| New instances for each machine, before (usual case) | 625.4 | 888.2 |                                  — |
+| Shared instances, before (possible, but not safe) | 625.8 | 736.8 |                    151.4 B (17.0%) |
+| New instances for each machine, after             | 649.7 | 912.2 |                    −24.0 B (−2.7%) |
+| **Shared instances, after**                       | **617.7** | **729.1** |                **159.1 B (17.9%)** |
+
+Since a processor now keeps the given `CoreCapacity` (32 bytes) instead of copying its MIPS, each machine created with its own instance takes about 24 bytes more. With a shared instance, each machine takes about 8 bytes less.
+
+### Whole simulation while VMs are running
+
+Scenario: 1,000 Hosts with 32 cores, 4,000 VMs with 8 cores and 8,000 Cloudlets with 4 cores, measured at 5 seconds of simulation, when all VMs have a MIPS share allocated.
+
+Each configuration is compared with the usual case before #603: a new `CoreCapacity` and `BootModel` for each VM, since a mutable `BootModel` couldn't be safely shared.
+
+| `CoreCapacity` and `BootModel`                     |       Heap | Reduction (heap) | Reduction per VM |
+| -------------------------------------------------- | ---------: | ---------------: | ---------------: |
+| New instances for each VM, before (usual case)     | 7,930.3 KB |                — |                — |
+| Shared instances, before (possible, but not safe)  | 7,247.4 KB |  682.9 KB (8.6%) |            175 B |
+| New instances for each VM, after                   | 7,901.9 KB |   28.4 KB (0.4%) |              7 B |
+| **Shared instances, after**                        | **7,114.6 KB** | **815.7 KB (10.3%)** |        **209 B** |
+
+Of the 209 bytes saved per VM, 175 come from sharing the `BootModel` and its two `UtilizationModel`s, which #603 makes safe, and 34 come from #603 itself (shared before → shared after), since a VM's MIPS share is no longer a new `CoreCapacity`.

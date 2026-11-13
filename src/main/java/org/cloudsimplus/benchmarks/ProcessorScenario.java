@@ -39,8 +39,9 @@ import org.cloudsimplus.vms.VmSimple;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntFunction;
 
-/// A simulation scenario used by [ProcessorBenchmark], where Hosts and VMs have many CPU cores.
+/// A simulation scenario used by [ProcessorBenchmark] and [SharedConfigBenchmark], where Hosts and VMs have many CPU cores.
 /// It's built when the object is created and executed by [#run()].
 ///
 /// Hosts and VMs are created only by [#newHost(long, long, long, long, double)] and [#newVm(long, double)],
@@ -77,12 +78,19 @@ final class ProcessorScenario {
     private final CloudSimPlus simulation;
 
     ProcessorScenario() {
+        this(i -> newVm(VM_CORES, MIPS));
+    }
+
+    /// Creates a scenario using a given function to create each VM.
+    /// @param vmFactory a function that creates a VM with [#VM_CORES] cores for a given index
+    ///                  (its RAM, bandwidth and size are set by the scenario)
+    ProcessorScenario(final IntFunction<Vm> vmFactory) {
         simulation = new CloudSimPlus();
         final var datacenter = DatacenterSimple.of(simulation, createHosts(), new VmPlacementPolicyBestFit());
         datacenter.setSchedulingInterval(1);
 
         final DatacenterBroker broker = new DatacenterBrokerSimple(simulation);
-        final List<Vm> vms = createVms();
+        final List<Vm> vms = createVms(vmFactory);
         broker.submitVmList(vms);
         broker.submitCloudletList(createCloudlets());
     }
@@ -93,6 +101,21 @@ final class ProcessorScenario {
         final long start = System.nanoTime();
         simulation.start();
         return (System.nanoTime() - start) / 1e9;
+    }
+
+    /// Runs the simulation and executes an action once, at the first clock tick at or after a given time,
+    /// while VMs and Cloudlets are still running.
+    /// @param time the simulation time (in seconds) to execute the action
+    /// @param action the action to execute
+    void run(final double time, final Runnable action) {
+        final boolean[] executed = {false};
+        simulation.listeners().addOnClockTick(info -> {
+            if (!executed[0] && info.getTime() >= time) {
+                executed[0] = true;
+                action.run();
+            }
+        });
+        simulation.start();
     }
 
     private static List<Host> createHosts() {
@@ -106,11 +129,11 @@ final class ProcessorScenario {
         return hosts;
     }
 
-    private static List<Vm> createVms() {
+    private static List<Vm> createVms(final IntFunction<Vm> vmFactory) {
         final int count = HOSTS * VMS_PER_HOST;
         final var vms = new ArrayList<Vm>(count);
         for (int i = 0; i < count; i++) {
-            vms.add(newVm(VM_CORES, MIPS).setRam(VM_RAM).setBw(VM_BW).setSize(VM_SIZE));
+            vms.add(vmFactory.apply(i).setRam(VM_RAM).setBw(VM_BW).setSize(VM_SIZE));
         }
 
         return vms;
